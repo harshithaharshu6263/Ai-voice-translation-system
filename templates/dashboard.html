@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VoiceTranslate Pro — New Horizon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #030d1a;
+      --surface: #071428;
+      --surface2: #0b1f3a;
+      --border: #1a3557;
+      --accent: #1e6fff;
+      --blue: #3b9dff;
+      --green: #22d47e;
+      --red: #ff4757;
+      --text: #f0f0f5;
+      --muted: #5a7a9e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,15,0.97);
+      position: sticky; top: 0; z-index: 100;
+      gap: 12px;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+
+    /* REVA logo in header */
+    .reva-logo-wrap {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 5px 12px 5px 8px;
+    }
+    .reva-logo-wrap img {
+      height: 30px;
+      object-fit: contain;
+      filter: brightness(1.1);
+    }
+    .reva-logo-text { font-size: 10px; color: #4d8fff; line-height: 1.3; }
+    .reva-logo-text strong { display: block; font-size: 11px; color: #ffffff; }
+
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo-icon { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .logo-text { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; }
+    .logo-text span { color: var(--accent); }
+    .btn-logout { padding: 7px 13px; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    .page { max-width: 680px; margin: 28px auto; padding: 0 20px; }
+
+    /* ── AUTO-SEND NOTICE ── */
+    .auto-notice {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(34,212,126,0.07);
+      border: 1px solid rgba(34,212,126,0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: var(--green);
+    }
+    .auto-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── STEPS ── */
+    .steps { display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 13px 18px; margin-bottom: 18px; }
+    .step { display: flex; align-items: center; gap: 7px; flex: 1; }
+    .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+    .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .step.done   .step-num { background: var(--green);  border-color: var(--green);  color: #000; }
+    .step-label { font-size: 10px; color: var(--muted); }
+    .step.active .step-label, .step.done .step-label { color: var(--text); }
+    .step-arrow { color: var(--border); font-size: 16px; margin: 0 4px; flex-shrink: 0; }
+
+    /* ── CARD ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── GMAIL INPUT ── */
+    .gmail-wrap { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 4px 4px 4px 13px; margin-bottom: 13px; transition: border-color 0.2s; }
+    .gmail-wrap:focus-within { border-color: var(--accent); }
+    .gmail-wrap input { flex: 1; background: transparent; border: none; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; padding: 8px 0; }
+    .gmail-wrap input::placeholder { color: var(--muted); }
+
+    /* ── LANG ROW ── */
+    .lang-row { display: flex; gap: 10px; align-items: center; margin-bottom: 13px; }
+    select { flex: 1; padding: 9px 11px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; outline: none; }
+    select:focus { border-color: var(--accent); }
+    .arr { color: var(--muted); font-size: 18px; flex-shrink: 0; }
+
+    /* ── BUTTONS ── */
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 13px; }
+    .btn { padding: 9px 15px; border: none; border-radius: 10px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-blue  { background: var(--blue);    color: #fff; }
+    .btn-green { background: var(--green);   color: #000; }
+    .btn-red   { background: var(--red);     color: #fff; }
+    .btn-gray  { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-main  { background: linear-gradient(135deg, #1e6fff, #4d8fff); color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; width: 100%; justify-content: center; padding: 13px; border-radius: 12px; }
+    .btn-main:hover { filter: brightness(1.1); }
+
+    /* ── TEXT BOXES ── */
+    .text-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: pulse 1s infinite; display: none; }
+    .listening .rec-dot { display: inline-block; }
+    .text-box { min-height: 90px; padding: 11px 13px; border-radius: 10px; white-space: pre-wrap; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.7; margin-bottom: 13px; }
+    #text       { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+    #translated { background: rgba(59,157,255,0.05); border: 1px dashed rgba(59,157,255,0.3); color: #93c5fd; }
+
+    /* ── RESULT ── */
+    .result-card { background: rgba(34,212,126,0.07); border: 1px solid rgba(34,212,126,0.3); border-radius: 12px; padding: 15px 17px; margin-top: 13px; display: none; animation: up 0.4s ease; }
+    @keyframes up { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .result-title { font-size: 14px; font-weight: 600; color: var(--green); margin-bottom: 8px; }
+    .result-row { font-size: 12px; color: var(--muted); margin-bottom: 4px; line-height: 1.6; }
+    .result-row strong { color: var(--text); }
+    audio { width: 100%; border-radius: 8px; margin-top: 10px; }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { display: none; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+    .progress-wrap.show { display: block; }
+    .progress-label { font-size: 11px; color: var(--muted); margin-bottom: 7px; }
+    .progress-bar-bg { background: var(--border); border-radius: 4px; height: 4px; overflow: hidden; }
+    .progress-bar { height: 4px; background: var(--accent); border-radius: 4px; width: 0%; transition: width 0.4s ease; }
+    .progress-steps { display: flex; justify-content: space-between; margin-top: 6px; }
+    .p-step { font-size: 10px; color: var(--muted); }
+    .p-step.done { color: var(--green); }
+    .p-step.active { color: var(--accent); }
+
+    /* ── HISTORY ── */
+    .h-entry { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 7px; cursor: pointer; transition: border-color 0.2s; }
+    .h-entry:hover { border-color: var(--accent); }
+    .h-time  { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+    .h-orig  { font-size: 12px; color: var(--text);  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .h-trans { font-size: 12px; color: var(--blue);  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .h-clear { width: 100%; padding: 8px; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; margin-top: 6px; }
+    .h-clear:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 20px; right: 20px; padding: 11px 17px; border-radius: 10px; font-size: 13px; z-index: 999; opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.success { background: rgba(34,212,126,0.15); border: 1px solid var(--green); color: var(--green); }
+    #toast.error   { background: rgba(255,71,87,0.15);  border: 1px solid var(--red);   color: var(--red); }
+    #toast.info    { background: rgba(59,157,255,0.15); border: 1px solid var(--blue);  color: var(--blue); }
+
+    @media(max-width:560px) {
+      .steps { flex-wrap: wrap; gap: 8px; }
+      .step-arrow { display: none; }
+      .reva-logo-text { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER with REVA logo -->
+  <div class="header">
+    <div class="header-left">
+      <!-- New Horizon Logo -->
+      <div class="reva-logo-wrap">
+        <div style="width:30px;height:30px;background:linear-gradient(135deg,#1e6fff,#4d8fff);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🎓</div>
+        <div class="reva-logo-text">
+          <strong>New Horizon College</strong>
+          of Engineering · Bengaluru
+        </div>
+      </div>
+      <!-- App logo -->
+      <div class="logo">
+        <div class="logo-icon">🎤</div>
+        <div class="logo-text">Voice<span>Translate</span></div>
+      </div>
+    </div>
+    <a href="/logout"><button class="btn-logout">Logout →</button></a>
+  </div>
+
+  <div id="toast"></div>
+
+  <div class="page">
+
+    <!-- AUTO-SEND NOTICE -->
+    <div class="auto-notice">
+      <div class="auto-dot"></div>
+      <span><strong>Auto-Send ON</strong> — Translated audio is sent to Gmail automatically after translation completes.</span>
+    </div>
+
+    <!-- STEPS -->
+    <div class="steps">
+      <div class="step active" id="s1"><div class="step-num">1</div><div class="step-label">Enter Gmail</div></div>
+      <div class="step-arrow">›</div>
+      <div class="step" id="s2"><div class="step-num">2</div><div class="step-label">Speak</div></div>
+      <div class="step-arrow">›</div>
+      <div class="step" id="s3"><div class="step-num">3</div><div class="step-label">Translate</div></div>
+      <div class="step-arrow">›</div>
+      <div class="step" id="s4"><div class="step-num">✓</div><div class="step-label">Auto → Gmail ✉️</div></div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card">
+      <div class="card-title">🎤 Speak & Auto-Translate to Gmail</div>
+
+      <!-- Gmail input -->
+      <div class="gmail-wrap">
+        <span style="font-size:17px">📧</span>
+        <input type="email" id="emailInput" placeholder="Enter Gmail — audio auto-sends here after translation" oninput="onEmailInput()" />
+      </div>
+
+      <!-- Language selectors -->
+      <div class="lang-row">
+        <select id="language">
+          <option value="en-IN">🇮🇳 English</option>
+          <option value="kn-IN" selected>🇮🇳 Kannada</option>
+          <option value="hi-IN">🇮🇳 Hindi</option>
+          <option value="ta-IN">🇮🇳 Tamil</option>
+          <option value="te-IN">🇮🇳 Telugu</option>
+          <option value="ml-IN">🇮🇳 Malayalam</option>
+        </select>
+        <div class="arr">→</div>
+        <select id="targetLang">
+          <option value="en">English</option>
+          <option value="kn">Kannada</option>
+          <option value="hi">Hindi</option>
+          <option value="ta">Tamil</option>
+          <option value="te">Telugu</option>
+          <option value="ml">Malayalam</option>
+        </select>
+      </div>
+
+      <!-- Record buttons -->
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="startSpeech()">🎤 Start Speaking</button>
+        <button class="btn btn-red"   onclick="stopAndTranslate()">⏹ Stop & Translate</button>
+        <button class="btn btn-gray"  onclick="clearAll()">🗑 Clear</button>
+      </div>
+
+      <!-- Original text -->
+      <div class="text-label" id="origLabel">
+        <div class="rec-dot" id="recDot"></div>
+        📝 Your Speech
+      </div>
+      <div id="text" class="text-box">Click 🎤 Start Speaking and speak...</div>
+
+      <!-- Translated text -->
+      <div class="text-label">🌐 Translated Text</div>
+      <div id="translated" class="text-box">Translated text will appear here...</div>
+
+      <!-- PROGRESS BAR -->
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-label" id="progressLabel">Processing...</div>
+        <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="progress-steps">
+          <span class="p-step" id="ps1">🔤 Translating</span>
+          <span class="p-step" id="ps2">🔊 Generating audio</span>
+          <span class="p-step" id="ps3">📧 Sending Gmail</span>
+        </div>
+      </div>
+
+      <!-- MANUAL TRANSLATE BUTTON (fallback) -->
+      <button class="btn btn-main" id="translateBtn" onclick="translateAndSend()">
+        🌐 Translate &amp; Auto-Send to Gmail
+      </button>
+
+      <!-- EXTRA SEND BUTTONS -->
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn btn-green" onclick="sendText(this)"  style="flex:1;justify-content:center;">📧 Send Text Only</button>
+        <button class="btn btn-blue"  onclick="sendPDF(this)"   style="flex:1;justify-content:center;">📄 Send PDF</button>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-card" id="resultCard">
+        <div class="result-title" id="resultTitle">✅ Sent to Gmail!</div>
+        <div class="result-row" id="r1"></div>
+        <div class="result-row" id="r2"></div>
+        <div class="result-row" id="r3"></div>
+        <audio id="audioPlayer" controls></audio>
+      </div>
+
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card">
+      <div class="card-title">📜 Translation History</div>
+      <div id="historyList"></div>
+      <button class="h-clear" onclick="clearHistory()">🗑 Clear History</button>
+    </div>
+
+  </div><!-- /page -->
+
+  <script>
+    let recognition;
+    let isListening = false;          // guard against duplicate starts
+    let finalTranscript = '';         // accumulates confirmed words
+    let hist = JSON.parse(localStorage.getItem('vt_hist') || '[]');
+    window.onload = renderHistory;
+
+    // ── TOAST ──
+    function toast(msg, type='info') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `show ${type}`;
+      setTimeout(() => t.className = '', 3500);
+    }
+
+    // ── STEPS ──
+    function setStep(n) {
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById('s'+i);
+        el.className = i < n ? 'step done' : i === n ? 'step active' : 'step';
+      }
+    }
+
+    function onEmailInput() {
+      const e = document.getElementById('emailInput').value.trim();
+      setStep(e ? 2 : 1);
+    }
+
+    // ── PROGRESS ──
+    function showProgress(pct, label, step) {
+      const pw = document.getElementById('progressWrap');
+      pw.classList.add('show');
+      document.getElementById('progressLabel').textContent = label;
+      document.getElementById('progressBar').style.width = pct + '%';
+      ['ps1','ps2','ps3'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.className = 'p-step' + (i+1 < step ? ' done' : i+1 === step ? ' active' : '');
+      });
+    }
+    function hideProgress() {
+      document.getElementById('progressWrap').classList.remove('show');
+      document.getElementById('progressBar').style.width = '0%';
+    }
+
+    // ── SPEECH ──
+    function startSpeech() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        toast('❌ Please use Chrome browser', 'error'); return;
+      }
+      if (isListening) return;          // already running — do nothing
+
+      // Reset accumulated transcript for a fresh session
+      finalTranscript = '';
+
+      const lang = document.getElementById('language').value;
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = lang;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onresult = (e) => {
+        let interim = '';
+        // Walk only the NEW results from resultIndex onward
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const transcript = e.results[i][0].transcript;
+          if (e.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interim += transcript;
+          }
+        }
+        // Show final words + grey interim hint
+        document.getElementById('text').innerText =
+          (finalTranscript + interim).trim() || '🎧 Listening... speak now';
+      };
+
+      recognition.onerror = (err) => {
+        // 'no-speech' is harmless — Chrome fires it after silence
+        if (err.error !== 'no-speech') {
+          toast('⚠️ Mic error: ' + err.error, 'error');
+        }
+        stopIndicator();
+        isListening = false;
+      };
+
+      // Chrome stops recognition after ~60 s of silence; restart transparently
+      recognition.onend = () => {
+        if (isListening) {
+          try { recognition.start(); }
+          catch(e) { /* already started */ }
+        } else {
+          stopIndicator();
+        }
+      };
+
+      recognition.start();
+      isListening = true;
+      document.getElementById('text').innerText = '🎧 Listening... speak now';
+      document.getElementById('origLabel').classList.add('listening');
+      setStep(2);
+      toast('🎤 Listening...', 'info');
+    }
+
+    // Stop speaking and AUTO-translate immediately
+    function stopAndTranslate() {
+      isListening = false;              // prevent auto-restart in onend
+      if (recognition) recognition.stop();
+      stopIndicator();
+      // small delay so the final onresult fires before we read the text
+      setTimeout(() => {
+        // If finalTranscript has content, push it into the box before sending
+        if (finalTranscript.trim()) {
+          document.getElementById('text').innerText = finalTranscript.trim();
+        }
+        translateAndSend();
+      }, 500);
+    }
+
+    function stopIndicator() {
+      isListening = false;
+      document.getElementById('origLabel').classList.remove('listening');
+    }
+
+    // ── MAIN: TRANSLATE → GENERATE AUDIO → AUTO-SEND TO GMAIL ──
+    async function translateAndSend() {
+      const text   = document.getElementById('text').innerText.trim();
+      const target = document.getElementById('targetLang').value;
+      const email  = document.getElementById('emailInput').value.trim();
+
+      if (!text || text.startsWith('Click 🎤') || text.startsWith('🎧')) {
+        toast('⚠️ Please speak something first', 'error'); return;
+      }
+      if (!email) {
+        toast('⚠️ Please enter your Gmail address first', 'error'); return;
+      }
+      if (recognition) recognition.stop();
+      stopIndicator();
+
+      const btn = document.getElementById('translateBtn');
+      btn.disabled = true;
+      btn.innerText = '⏳ Working...';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('translated').innerText = '⏳ Translating...';
+      setStep(3);
+
+      try {
+        // STEP 1 — Translate
+        showProgress(15, '🔤 Translating text...', 1);
+        toast('🔤 Translating...', 'info');
+
+        const r1 = await fetch('/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, target })
+        });
+        const d1 = await r1.json();
+        const translated = d1.translated || 'Translation failed';
+        document.getElementById('translated').innerText = translated;
+
+        // STEP 2 — Generate audio + STEP 3 — Auto-send to Gmail
+        showProgress(50, '🔊 Generating translated audio...', 2);
+        toast('🔊 Generating audio & sending to Gmail...', 'info');
+
+        const r2 = await fetch('/tts-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            text: translated,
+            lang: target.slice(0, 2),
+            original_text: text,
+            translated_text: translated
+          })
+        });
+        const d2 = await r2.json();
+
+        showProgress(100, '📧 Sent to Gmail!', 3);
+
+        if (d2.success) {
+          showResult('✅ Translated audio auto-sent to Gmail!', email, text, translated);
+
+          // Play audio in browser too
+          if (d2.audio_base64) {
+            const bytes = atob(d2.audio_base64);
+            const arr = new Uint8Array(bytes.length);
+            for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+            const audioEl = document.getElementById('audioPlayer');
+            audioEl.src = URL.createObjectURL(new Blob([arr], { type: 'audio/mpeg' }));
+            audioEl.style.display = 'block';
+            audioEl.play().catch(() => {});
+          }
+
+          setStep(4);
+          toast('📧 Audio sent to Gmail automatically!', 'success');
+          addHistory(text, translated, target);
+
+        } else {
+          toast('❌ Email failed: ' + d2.error, 'error');
+          setStep(3);
+        }
+
+      } catch (e) {
+        toast('❌ Error: ' + e.message, 'error');
+      }
+
+      setTimeout(hideProgress, 2000);
+      btn.innerText = '🌐 Translate & Auto-Send to Gmail';
+      btn.disabled = false;
+    }
+
+    // ── SEND TEXT ONLY ──
+    async function sendText(btn) {
+      const original   = document.getElementById('text').innerText.trim();
+      const translated = document.getElementById('translated').innerText.trim();
+      const email      = document.getElementById('emailInput').value.trim();
+      if (!email)      { toast('⚠️ Enter Gmail first', 'error'); return; }
+      if (!translated || translated.includes('will appear')) { toast('⚠️ Translate first', 'error'); return; }
+      btn.innerText = '⏳ Sending...'; btn.disabled = true;
+      try {
+        const res = await fetch('/send-text-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, original_text: original, translated_text: translated })
+        });
+        const r = await res.json();
+        if (r.success) {
+          showResult('✅ Text sent to Gmail!', email, original, translated);
+          toast('📧 Text sent to Gmail!', 'success');
+        } else { toast('❌ ' + r.error, 'error'); }
+      } catch { toast('❌ Error sending text', 'error'); }
+      btn.innerText = '📧 Send Text Only'; btn.disabled = false;
+    }
+
+    // ── SEND PDF ──
+    async function sendPDF(btn) {
+      const original   = document.getElementById('text').innerText.trim();
+      const translated = document.getElementById('translated').innerText.trim();
+      const email      = document.getElementById('emailInput').value.trim();
+      if (!email)      { toast('⚠️ Enter Gmail first', 'error'); return; }
+      if (!translated || translated.includes('will appear')) { toast('⚠️ Translate first', 'error'); return; }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      document.head.appendChild(script);
+      await new Promise(r => { script.onload = r; if (window.jspdf) r(); });
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16); doc.text('Voice Translation Result', 10, 15);
+      doc.setFontSize(13); doc.text('Original Text:', 10, 30);
+      doc.setFontSize(11); doc.text(doc.splitTextToSize(original, 180), 10, 38);
+      doc.setFontSize(13); doc.text('Translated Text:', 10, 80);
+      doc.setFontSize(11); doc.text(doc.splitTextToSize(translated, 180), 10, 88);
+      const pdfOutput = doc.output();
+
+      btn.innerText = '⏳ Sending...'; btn.disabled = true;
+      try {
+        const res = await fetch('/send-pdf-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, pdf_content: pdfOutput, filename: 'translation.pdf', original_text: original, translated_text: translated })
+        });
+        const r = await res.json();
+        if (r.success) {
+          showResult('✅ PDF sent to Gmail!', email, original, translated);
+          toast('📄 PDF sent to Gmail!', 'success');
+        } else { toast('❌ ' + r.error, 'error'); }
+      } catch { toast('❌ Error sending PDF', 'error'); }
+      btn.innerText = '📄 Send PDF'; btn.disabled = false;
+    }
+
+    function showResult(title, email, original, translated) {
+      document.getElementById('resultTitle').textContent = title;
+      document.getElementById('r1').innerHTML = `<strong>📧 Sent to:</strong> ${email}`;
+      document.getElementById('r2').innerHTML = `<strong>📝 Original:</strong> ${original}`;
+      document.getElementById('r3').innerHTML = `<strong>🌐 Translated:</strong> ${translated}`;
+      document.getElementById('audioPlayer').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'block';
+    }
+
+    function clearAll() {
+      isListening = false;
+      if (recognition) recognition.stop();
+      stopIndicator();
+      hideProgress();
+      finalTranscript = '';
+      document.getElementById('text').innerText = 'Click 🎤 Start Speaking and speak...';
+      document.getElementById('translated').innerText = 'Translated text will appear here...';
+      document.getElementById('resultCard').style.display = 'none';
+      const e = document.getElementById('emailInput').value.trim();
+      setStep(e ? 2 : 1);
+    }
+
+    // ── HISTORY ──
+    function addHistory(orig, trans, lang) {
+      hist.unshift({ id: Date.now(), time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString(), orig, trans, lang });
+      if (hist.length > 30) hist.pop();
+      localStorage.setItem('vt_hist', JSON.stringify(hist));
+      renderHistory();
+    }
+    function renderHistory() {
+      const el = document.getElementById('historyList');
+      if (!hist.length) {
+        el.innerHTML = '<div style="text-align:center;padding:18px 0;color:var(--muted);font-size:12px;">No translations yet</div>';
+        return;
+      }
+      el.innerHTML = hist.map(h => `
+        <div class="h-entry" onclick="restore(${h.id})">
+          <div class="h-time">${h.date} · ${h.time} · ${h.lang.toUpperCase()}</div>
+          <div class="h-orig">${h.orig}</div>
+          <div class="h-trans">${h.trans}</div>
+        </div>
+      `).join('');
+    }
+    function restore(id) {
+      const h = hist.find(x => x.id === id);
+      if (!h) return;
+      document.getElementById('text').innerText = h.orig;
+      document.getElementById('translated').innerText = h.trans;
+      toast('📜 Restored from history', 'info');
+    }
+    function clearHistory() {
+      hist = [];
+      localStorage.removeItem('vt_hist');
+      renderHistory();
+      toast('🗑 History cleared', 'info');
+    }
+  </script>
+</body>
+</html>

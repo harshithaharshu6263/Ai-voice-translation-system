@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ 'Create account' if register else 'Sign in' }} · VoiceTranslate</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='workspace.css') }}">
+  <script defer src="{{ url_for('static',filename='preferences.js') }}"></script>
+</head>
+<body class="auth-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="auth-header"><a class="brand" href="/">◉ <span>Voice<span class="brand-accent">Translate</span></span></a><button type="button" class="quiet" id="themeButton" aria-label="Switch color theme">◐ Theme</button></header>
+  <main id="main" class="auth-layout">
+    <section class="auth-intro"><p class="eyebrow">WORDS WITHOUT BORDERS</p><h1>Make yourself<br><span class="brand-accent">understood.</span></h1><p class="lead">Speak, translate, and keep the words that matter. Your own space for every language.</p><div class="intro-tags"><span>Voice & text</span><span>Private history</span><span>Two-way conversations</span></div></section>
+    <section class="card auth-card" aria-labelledby="authTitle"><p class="eyebrow">YOUR LANGUAGE WORKSPACE</p><h2 id="authTitle">{{ 'Create your account' if register else 'Welcome back' }}</h2><p class="muted">{{ 'Save translations and build your personal phrasebook.' if register else 'Sign in to pick up where you left off.' }}</p>
+      {% if error %}<p class="notice error" role="alert">{{ error }}</p>{% endif %}
+      <form method="post" action="{{ '/register' if register else '/' }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if register %}<label for="name">Your name</label><input id="name" name="name" autocomplete="name" maxlength="80" required value="{{ request.form.get('name','') }}">{% endif %}
+        <label for="email">Email address</label><input id="email" type="email" name="email" autocomplete="email" maxlength="254" required value="{{ request.form.get('email','') }}">
+        <label for="password">Password</label><input id="password" type="password" name="password" autocomplete="{{ 'new-password' if register else 'current-password' }}" {% if register %}minlength="8"{% endif %} maxlength="128" required>
+        {% if register %}<p class="small muted">Use at least 8 characters.</p>{% endif %}
+        <button class="primary full-width" type="submit">{{ 'Create account' if register else 'Sign in' }} <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">{{ 'Already have an account?' if register else 'New here?' }} <a href="{{ '/' if register else '/register' }}">{{ 'Sign in' if register else 'Create an account' }}</a></p>
+    </section>
+  </main>
+  <footer class="auth-footer">One voice. Many possibilities.</footer>
+</body></html>
